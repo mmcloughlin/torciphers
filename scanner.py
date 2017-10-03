@@ -36,9 +36,10 @@ def scan_cipher_lists(addresses):
 
     # execute
     for result in s.get_results(): 
+        addr = result.server_info.hostname
         logging.info('results for %s', addr)
         for cipher in result.accepted_cipher_list:
-            print result.server_info.hostname, cipher.name, cipher.ssl_version
+            print addr, cipher.name, cipher.ssl_version
 
 
 def read_or_addresses(f):
