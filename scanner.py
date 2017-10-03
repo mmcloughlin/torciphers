@@ -20,6 +20,9 @@ def scan_commands():
 
 
 def output_cipher(addr, cipher, label):
+    if cipher is None:
+        logger.info('null cipher')
+        return
     print addr, label, cipher.name, cipher.ssl_version
 
 
