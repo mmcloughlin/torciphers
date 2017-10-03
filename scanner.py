@@ -25,12 +25,18 @@ def scan_cipher_lists(addresses):
     for addr in addresses:
         ip, port = split_host_port(addr)
         server_info = ServerConnectivityInfo(hostname=addr, ip_address=ip, port=port)
-        server_info.test_connectivity_to_server()
+        try:
+            server_info.test_connectivity_to_server()
+            logging.info('connected to %s', addr)
+        except:
+            logging.warn('connection to %s failed', addr)
+            continue
         for cmd in scan_commands():
             s.queue_scan_command(server_info, cmd)
 
     # execute
     for result in s.get_results(): 
+        logging.info('results for %s', addr)
         for cipher in result.accepted_cipher_list:
             print result.server_info.hostname, cipher.name, cipher.ssl_version
 
