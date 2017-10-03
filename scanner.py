@@ -16,6 +16,8 @@ def split_host_port(addr):
 def scan_commands():
     return [
             Tlsv10ScanCommand(),
+            Tlsv11ScanCommand(),
+            Tlsv12ScanCommand(),
             ]
 
 
