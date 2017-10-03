@@ -19,27 +19,29 @@ def scan_commands():
             ]
 
 
+def output_cipher(addr, cipher, label):
+    print addr, label, cipher.name, cipher.ssl_version
+
+
 def scan_cipher_lists(addresses):
     # prepare scanner
     s = ConcurrentScanner()
     for addr in addresses:
         ip, port = split_host_port(addr)
         server_info = ServerConnectivityInfo(hostname=addr, ip_address=ip, port=port)
-        try:
-            server_info.test_connectivity_to_server()
-            logging.info('connected to %s', addr)
-        except:
-            logging.warn('connection to %s failed', addr)
-            continue
         for cmd in scan_commands():
             s.queue_scan_command(server_info, cmd)
 
     # execute
-    for result in s.get_results(): 
+    for result in s.get_results():
         addr = result.server_info.hostname
+        if not isinstance(result, CipherSuiteScanResult):
+            logging.info('failed to get results for %s', addr)
+            continue
         logging.info('results for %s', addr)
         for cipher in result.accepted_cipher_list:
-            print addr, cipher.name, cipher.ssl_version
+            output_cipher(addr, cipher, label='accepted')
+        output_cipher(addr, result.preferred_cipher, label='preferred')
 
 
 def read_or_addresses(f):
@@ -49,13 +51,11 @@ def read_or_addresses(f):
     """
     data = json.load(f)
     relays = data['relays']
-
     addresses = []
     for relay in relays:
         if not relay['running']:
             continue
         addresses.append(relay['or_addresses'][0])
-
     return addresses
 
 
