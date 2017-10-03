@@ -26,9 +26,9 @@ def output_cipher(addr, cipher, label):
     print addr, label, cipher.name, cipher.ssl_version
 
 
-def scan_cipher_lists(addresses):
+def scan_cipher_lists(addresses, concurrent=16):
     # prepare scanner
-    s = ConcurrentScanner()
+    s = ConcurrentScanner(max_processes_nb=concurrent)
     for addr in addresses:
         ip, port = split_host_port(addr)
         server_info = ServerConnectivityInfo(hostname=addr, ip_address=ip, port=port)
@@ -74,7 +74,7 @@ def main(args):
     sample = random.sample(addresses, sample_size)
     logging.info('sampled %d of %d running relays', sample_size, len(addresses))
 
-    scan_cipher_lists(sample)
+    scan_cipher_lists(sample, concurrent=32)
 
 
 if __name__ == '__main__':
